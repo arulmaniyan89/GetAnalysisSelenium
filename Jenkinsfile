@@ -1,27 +1,28 @@
 pipeline {
-    agent any
-    stages {
-stage('scm') {
-steps {
-    git 'https://github.com/ganeshlovesdevops/maven_demo.git'
+  agent any
+  tools {
+    maven 'maven-3.6.3' // specify the Maven version to use
+  }
+  stages {
+    stage ('Checkout') {
+      steps {
+        git 'https://github.com/arulmaniyan89/GetAnalysisSelenium.git' // clone the Git repository
+      }
     }
-}
-    stage('build') {
-    steps {
-        withMaven(maven : 'mymaven'){
-        bat "mvn clean install"
+    stage ('Build') {
+      steps {
+        sh 'mvn -f GetMoneyRichAutomation/pom.xml clean package' // run the Maven command with the pom.xml file in the subdirectory
+      }
     }
+    stage ('Test') {
+      steps {
+        sh 'mvn -f GetMoneyRichAutomation/pom.xml test' // run the Maven test command
+      }
+      post {
+        always {
+          junit 'GetMoneyRichAutomation/target/surefire-reports/*.xml' // publish the test results
+        }
+      }
     }
-}
-    stage('junit') {
-steps {
-    junit healthScaleFactor: 10.0, testResults: '**/gameoflife-web/target/surefire-reports/*.xml'
-    }
-}
-    stage('deploy') {
-steps {
-    bat 'copy "C:\\Program Files (x86)\\Jenkins\\workspace\\raghupipeline\\gameoflife-web\\target\\*.war" "C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps\\"'
-    }
-}
-}
+  }
 }
