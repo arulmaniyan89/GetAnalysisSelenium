@@ -11,7 +11,8 @@ pipeline {
     }
     stage ('Build') {
       steps {
-        sh 'mvn -f GetMoneyRichAutomation/pom.xml clean package' // run the Maven command with the pom.xml file in the subdirectory
+        withMaven(maven : 'mymaven'){
+        bat "mvn clean install"
       }
     }
     stage ('Test') {
